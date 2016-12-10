@@ -104,38 +104,12 @@ public class Player
 			//     continue;
 			// }
 
-			if (turnNumber == 1)
-			{
-				scores = new int[enemies.Count + 1];
-			}
+			//if (turnNumber == 1)
+			//{
+			//	scores = new int[enemies.Count + 1];
+			//}
 
 			var gameState = new GameState(map, self, enemies, bombs, turnNumber);
-			var solutions = new List<Solution>();
-
-			// if (lastBest != null)
-			// {
-			//     solutions.Add(lastBest);
-			// }
-
-			var timer = new Stopwatch();
-			timer.Start();
-			while (timer.ElapsedMilliseconds <= 90)
-			{
-				solutions.Add(Solution.generateSolution(gameState.Clone(), 20));
-			}
-			timer.Stop();
-
-			Solution best = null;
-			double maxScore = Double.NegativeInfinity;
-			foreach (Solution s in solutions)
-			{
-				//Console.Error.WriteLine(s.score);
-				if (s.score > maxScore)
-				{
-					maxScore = s.score;
-					best = s;
-				}
-			}
 
 			// gameState.printMap();
 			// Console.Error.WriteLine();
@@ -152,12 +126,15 @@ public class Player
 			//Console.Error.WriteLine("Move: {0}", best.moves[0]);
 			//Console.Error.WriteLine("Is alive: {0}", gameState.self.isAlive);
 			//Console.Error.WriteLine("Position: ({0}, {1})", gameState.self.x, gameState.self.y);
+
+			var best = Solution.generateBestRandomSolution(gameState, 20, 90);
+
 			gameState.play(best.moves[0]);
 			self.getCommand(best.moves[0]);
-			foreach (int s in scores)
-			{
-				Console.Error.WriteLine(s);
-			}
+			//foreach (int s in scores)
+			//{
+			//	Console.Error.WriteLine(s);
+			//}
 			// best.moves.RemoveAt(0);
 			// lastBest = best;
 		}

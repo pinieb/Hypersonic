@@ -9,6 +9,8 @@ public class GameState
 	public List<Robot> enemies;
 	public List<Bomb> bombs;
 	public int turnNumber;
+	private double lastComputedScore;
+	private int lastScoreComputation;
 
 	private GameState()
 	{
@@ -34,6 +36,18 @@ public class GameState
 		return clone;
 	}
 
+	public Robot getBot(int id)
+	{
+		if (this.self.owner == id)
+		{
+			return this.self;
+		}
+		else
+		{
+			return this.enemies.FirstOrDefault(x => x.owner == id);
+		}
+	}
+
 	public void play(Solution s)
 	{
 		foreach (Move m in s.moves)
@@ -48,10 +62,7 @@ public class GameState
 
 	public void play(Move move)
 	{
-		foreach (Bomb b in this.bombs)
-		{
-			b.countDown--;
-		}
+		this.tick();
 
 		// handle explosions
 		this.handleExplosions();
@@ -202,6 +213,65 @@ public class GameState
 			this.map[i.x, i.y] = Constants.MAP_FLOOR;
 		}
 	}
+			            
+	public double score()
+	{
+		if (this.lastScoreComputation == this.turnNumber)
+		{
+			return this.lastComputedScore;
+		}
+
+		if (!this.self.isAlive)
+		{
+			this.lastScoreComputation = this.turnNumber;
+			this.lastComputedScore = -8000000;
+			return this.lastComputedScore;
+		}
+
+		double score = 0;
+
+		score += 7 * this.self.boxesDestroyed;
+		score += this.self.bombRange + this.self.maxBombs;
+
+		foreach (var e in enemies)
+		{
+			score += 7 * e.boxesDestroyed;
+			score += this.self.bombRange + this.self.maxBombs;
+		}
+
+		this.lastScoreComputation = this.turnNumber;
+		this.lastComputedScore = score;
+		return this.lastComputedScore;
+	}
+
+	public void printMap()
+	{
+		for (int i = 0; i < this.map.GetLength(1); i++)
+		{
+			for (int j = 0; j < this.map.GetLength(0); j++)
+			{
+				if (this.self.x == j && this.self.y == i)
+				{
+					Console.Error.Write("*");
+				}
+				else
+				{
+					Console.Error.Write(this.map[j, i]);
+				}
+			}
+			Console.Error.WriteLine();
+		}
+	}
+
+	private void tick()
+	{
+		foreach (Bomb b in this.bombs)
+		{
+			b.countDown--;
+		}
+
+		this.turnNumber++;
+	}
 
 	private bool handleExplosion(Bomb b, int explosionX, int explosionY, List<Bomb> toExplode, List<Bomb> exploded, List<Box> destroyedBoxes, List<Unit> destroyedItems)
 	{
@@ -261,18 +331,6 @@ public class GameState
 		return true;
 	}
 
-	public Robot getBot(int id)
-	{
-		if (this.self.owner == id)
-		{
-			return this.self;
-		}
-		else
-		{
-			return this.enemies.FirstOrDefault(x => x.owner == id);
-		}
-	}
-
 	private void handleNewPosition(MoveType type)
 	{
 		var cell = this.map[this.self.x, this.self.y];
@@ -290,45 +348,5 @@ public class GameState
 		}
 
 		this.map[this.self.x, this.self.y] = Constants.MAP_FLOOR;
-	}
-			            
-	public double score()
-	{
-		if (!this.self.isAlive)
-		{
-			return -8000000;
-		}
-
-		double score = 0;
-
-		score += 7 * this.self.boxesDestroyed;
-		score += this.self.bombRange + this.self.maxBombs;
-
-		foreach (var e in enemies)
-		{
-			score += 7 * e.boxesDestroyed;
-			score += this.self.bombRange + this.self.maxBombs;
-		}
-
-		return score;
-	}
-
-	public void printMap()
-	{
-		for (int i = 0; i < this.map.GetLength(1); i++)
-		{
-			for (int j = 0; j < this.map.GetLength(0); j++)
-			{
-				if (this.self.x == j && this.self.y == i)
-				{
-					Console.Error.Write("*");
-				}
-				else
-				{
-					Console.Error.Write(this.map[j, i]);
-				}
-			}
-			Console.Error.WriteLine();
-		}
 	}
 }

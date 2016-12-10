@@ -18,6 +18,12 @@ public class Move
 	public MoveType type;
 	public MoveDirection direction;
 
+	public Move(MoveType type, MoveDirection direction)
+	{
+		this.type = type;
+		this.direction = direction;
+	}
+
 	public override string ToString()
 	{
 		return this.type.ToString() + " " + this.direction.ToString();

@@ -98,11 +98,7 @@ public class Robot : Unit
 		{
 			foreach (MoveDirection d in directions)
 			{
-				var move = new Move();
-				move.type = t;
-				move.direction = d;
-
-				moves.Add(move);
+				moves.Add(new Move(t, d));
 			}
 		}
 
