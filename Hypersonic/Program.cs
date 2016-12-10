@@ -109,7 +109,7 @@ public class Player
 				scores = new int[enemies.Count + 1];
 			}
 
-			var gameState = new GameState(map, self, enemies, bombs, scores, turnNumber);
+			var gameState = new GameState(map, self, enemies, bombs, turnNumber);
 			var solutions = new List<Solution>();
 
 			// if (lastBest != null)

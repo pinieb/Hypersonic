@@ -5,7 +5,6 @@ using System.Linq;
 public class GameState
 {
 	public char[,] map;
-	public int[] scores;
 	public Robot self;
 	public List<Robot> enemies;
 	public List<Bomb> bombs;
@@ -15,21 +14,19 @@ public class GameState
 	{
 	}
 
-	public GameState(char[,] map, Robot self, List<Robot> enemies, List<Bomb> bombs, int[] scores, int turnNumber)
+	public GameState(char[,] map, Robot self, List<Robot> enemies, List<Bomb> bombs, int turnNumber)
 	{
 		this.map = map;
 		this.self = self;
 		this.enemies = enemies;
 		this.bombs = bombs;
 		this.turnNumber = turnNumber;
-		this.scores = scores;
 	}
 
 	public GameState Clone()
 	{
 		var clone = new GameState();
 		clone.map = (char[,])this.map.Clone();
-		clone.scores = (int[])this.scores.Clone();
 		clone.enemies = this.enemies.ConvertAll(e => e.Clone());
 		clone.bombs = this.bombs.ConvertAll(b => b.Clone());
 		clone.self = self.Clone();
@@ -217,7 +214,11 @@ public class GameState
 		var cell = this.map[explosionX, explosionY];
 		if (cell == Constants.MAP_BOX || cell == Constants.MAP_BOX_RANGE || cell == Constants.MAP_BOX_BOMB)
 		{
-			this.scores[b.owner]++;
+			var owner = this.getBot(b.owner);
+			if (owner != null)
+			{
+				owner.boxesDestroyed++;
+			}
 
 			var box = new Box();
 			box.x = explosionX;
@@ -260,6 +261,18 @@ public class GameState
 		return true;
 	}
 
+	public Robot getBot(int id)
+	{
+		if (this.self.owner == id)
+		{
+			return this.self;
+		}
+		else
+		{
+			return this.enemies.FirstOrDefault(x => x.owner == id);
+		}
+	}
+
 	private void handleNewPosition(MoveType type)
 	{
 		var cell = this.map[this.self.x, this.self.y];
@@ -278,7 +291,7 @@ public class GameState
 
 		this.map[this.self.x, this.self.y] = Constants.MAP_FLOOR;
 	}
-
+			            
 	public double score()
 	{
 		if (!this.self.isAlive)
@@ -288,17 +301,12 @@ public class GameState
 
 		double score = 0;
 
-		for (int i = 0; i < this.scores.Length; i++)
-		{
-			if (i == this.self.owner)
-			{
-				score += 7 * this.scores[i];
-			}
-			else
-			{
-				score -= 7 * this.scores[i];
-			}
+		score += 7 * this.self.boxesDestroyed;
+		score += this.self.bombRange + this.self.maxBombs;
 
+		foreach (var e in enemies)
+		{
+			score += 7 * e.boxesDestroyed;
 			score += this.self.bombRange + this.self.maxBombs;
 		}
 

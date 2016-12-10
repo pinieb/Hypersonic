@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class Robot : Unit
 {
 	public bool isAlive = true;
+	public int boxesDestroyed = 0;
 	public int maxBombs = 1;
 	public int bombs
 	{
@@ -39,6 +40,7 @@ public class Robot : Unit
 		clone.y = this.y;
 		clone.maxBombs = this.maxBombs;
 		clone.isAlive = this.isAlive;
+		clone.boxesDestroyed = this.boxesDestroyed;
 
 		return clone;
 	}
