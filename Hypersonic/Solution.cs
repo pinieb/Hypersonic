@@ -34,7 +34,7 @@ public class Solution
 		}
 		timer.Stop();
 
-		Console.Error.WriteLine(solutions.Count);
+		//Console.Error.WriteLine(solutions.Count);
 		Solution best = null;
 		double maxScore = Double.NegativeInfinity;
 		foreach (Solution s in solutions)

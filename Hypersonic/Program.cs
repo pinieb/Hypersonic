@@ -36,9 +36,9 @@ public class Player
 				for (int j = 0; j < width; j++)
 				{
 					map[j, i] = row[j];
-					//Console.Error.Write(row[j]);
+					Console.Error.Write(row[j]);
 				}
-				//Console.Error.WriteLine();
+				Console.Error.WriteLine();
 			}
 
 			int entities = int.Parse(Console.ReadLine());
@@ -110,6 +110,9 @@ public class Player
 			//}
 
 			var gameState = new GameState(map, self, enemies, bombs, turnNumber);
+			var bgs = new BitState(map, enemies, bombs, turnNumber);
+			Console.Error.WriteLine();
+			bgs.printMap();
 
 			// gameState.printMap();
 			// Console.Error.WriteLine();
