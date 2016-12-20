@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hypersonic", "Hypersonic\Hy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HypersonicTests", "HypersonicTests\HypersonicTests.csproj", "{499D7C4A-F648-4D9A-B211-21FFA288AA3E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HypersonicConsole", "HypersonicConsole\HypersonicConsole.csproj", "{E8DC01D7-A13D-4D6F-9F11-49907CCD864A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,5 +21,9 @@ Global
 		{499D7C4A-F648-4D9A-B211-21FFA288AA3E}.Debug|x86.Build.0 = Debug|Any CPU
 		{499D7C4A-F648-4D9A-B211-21FFA288AA3E}.Release|x86.ActiveCfg = Release|Any CPU
 		{499D7C4A-F648-4D9A-B211-21FFA288AA3E}.Release|x86.Build.0 = Release|Any CPU
+		{E8DC01D7-A13D-4D6F-9F11-49907CCD864A}.Debug|x86.ActiveCfg = Debug|x86
+		{E8DC01D7-A13D-4D6F-9F11-49907CCD864A}.Debug|x86.Build.0 = Debug|x86
+		{E8DC01D7-A13D-4D6F-9F11-49907CCD864A}.Release|x86.ActiveCfg = Release|x86
+		{E8DC01D7-A13D-4D6F-9F11-49907CCD864A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal

@@ -7,6 +7,7 @@ public class Unit : IEquatable<Unit>
 	public int param2;
 	public int x;
 	public int y;
+	public int position;
 
 	public bool Equals(Unit other)
 	{

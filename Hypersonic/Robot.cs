@@ -113,6 +113,7 @@ public class Robot : Unit
 		b.owner = this.owner;
 		b.x = this.x;
 		b.y = this.y;
+		b.position = this.position;
 
 		this.bombs--;
 

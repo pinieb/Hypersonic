@@ -53,6 +53,7 @@
     <Compile Include="Solution.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="BitState.cs" />
+    <Compile Include="Bitmaps.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
