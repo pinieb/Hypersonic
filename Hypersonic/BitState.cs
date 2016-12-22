@@ -19,6 +19,8 @@ public class BitState
 	public List<Robot> bots;
 	public List<Bomb> bombs;
 	public int turnNumber;
+	private double lastComputedScore;
+	private int lastScoreComputation;
 
 	private BitState()
 	{
@@ -118,6 +120,10 @@ public class BitState
 			clone.playerMaps[i] = new BitArray(this.playerMaps[i]);
 			clone.bombMap[i] = new BitArray(this.bombMap[i]);
 		}
+
+		clone.turnNumber = this.turnNumber;
+		clone.lastComputedScore = this.lastComputedScore;
+		clone.lastScoreComputation = this.lastScoreComputation;
 
 		return clone;
 	}
@@ -459,6 +465,36 @@ public class BitState
 		}
 	}
 
+	public List<Move> getMoves(int playerId)
+	{
+		var bot = this.getBot(playerId);
+		var moves = new List<Move>();
+
+		var directions = new BitArray[] { Bitmaps.up[0][bot.position], Bitmaps.down[0][bot.position], Bitmaps.left[0][bot.position], Bitmaps.right[0][bot.position] };
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (getBombHits(directions[i]).Count > 0)
+			{
+				continue;
+			}
+
+			if (getBoxHits(directions[i]).Count > 0)
+			{
+				continue;
+			}
+
+			if (bot.bombs > 0)
+			{
+				moves.Add(new Move(MoveType.Bomb, (MoveDirection) i));
+			}
+
+			moves.Add(new Move(MoveType.Move, (MoveDirection) i));
+		}
+
+		return moves;
+	}
+
 	private List<Bomb> getBombHits(BitArray mask)
 	{
 		var hits = new List<Bomb>();
@@ -735,5 +771,41 @@ public class BitState
 
 			s.WriteLine(" };");
 		}
+	}
+
+	public double score(int playerId)
+	{
+		var bot = this.getBot(playerId);
+		if (this.lastScoreComputation == this.turnNumber)
+		{
+			return this.lastComputedScore;
+		}
+
+		if (!bot.isAlive)
+		{
+			this.lastScoreComputation = this.turnNumber;
+			this.lastComputedScore = -8000000;
+			return this.lastComputedScore;
+		}
+
+		double score = 0;
+
+		foreach (var b in bots)
+		{
+			if (b.owner == playerId)
+			{
+				score += 7 * bot.boxesDestroyed;
+			}
+			else
+			{
+				score -= 7 * bot.boxesDestroyed;
+			}
+
+			score += bot.bombRange + bot.maxBombs;
+		}
+
+		this.lastScoreComputation = this.turnNumber;
+		this.lastComputedScore = score;
+		return this.lastComputedScore;
 	}
 }
