@@ -24,26 +24,29 @@ public class BitSolution
 
 	public static BitSolution generateBestRandomSolution(BitState g, int playerId, int depth, int timeToRun)
 	{
-		var solutions = new List<BitSolution>();
+		BitSolution best = null;
+		double maxScore = Double.NegativeInfinity;
+		int count = 0;
+
 		var timer = new Stopwatch();
 		timer.Start();
 		while (timer.ElapsedMilliseconds <= timeToRun)
 		{
-			solutions.Add(randomSolution(g.Clone(), playerId, depth));
+			//var time = timer.ElapsedMilliseconds;
+			//Console.Error.WriteLine("Time elapsed: {0} ms", time);
+			var solution = randomSolution(g.Clone(), playerId, depth);
+			if (solution.score > maxScore)
+			{
+				maxScore = solution.score;
+				best = solution;
+			}
+			count++;
+			//time = timer.ElapsedMilliseconds;
+			//Console.Error.WriteLine("Time elapsed: {0} ms", time);
 		}
 		timer.Stop();
 
-		//Console.Error.WriteLine(solutions.Count);
-		BitSolution best = null;
-		double maxScore = Double.NegativeInfinity;
-		foreach (BitSolution s in solutions)
-		{
-			if (s.score > maxScore)
-			{
-				maxScore = s.score;
-				best = s;
-			}
-		}
+		Console.Error.WriteLine("{0} solutions considered", count);
 
 		return best;
 	}
@@ -72,13 +75,24 @@ public class BitSolution
 
 	private static BitSolution randomSolution(BitState g, int playerId, int depth)
 	{
+		var movesTimer = new Stopwatch();
+		//var playTimer = new Stopwatch();
+		//var scoreTimer = new Stopwatch();
+
+		movesTimer.Start();
 		var s = new BitSolution();
+		movesTimer.Stop();
+		//Console.Error.WriteLine("Time to construct BitSolution: {0}", movesTimer.ElapsedMilliseconds);
 
 		for (int d = 0; d < depth; d++)
 		{
+			//movesTimer.Start();
 			var moves = g.getMoves(playerId);
+			//movesTimer.Stop();
 			var move = moves[BitSolution.rnd.Next(moves.Count)];
+			//playTimer.Start();
 			g.play(move, playerId);
+			//playTimer.Stop();
 			s.moves.Add(move);
 
 			if (!g.getBot(playerId).isAlive)
@@ -87,7 +101,15 @@ public class BitSolution
 			}
 		}
 
+		//scoreTimer.Start();
 		s.score = g.score(playerId);
+		//scoreTimer.Stop();
+
+		//Console.Error.WriteLine("Moves: {0} ms", movesTimer.ElapsedMilliseconds);
+		//Console.Error.WriteLine("Play: {0} ms", playTimer.ElapsedMilliseconds);
+		//Console.Error.WriteLine("Score: {0} ms", scoreTimer.ElapsedMilliseconds);
+		//Console.Error.WriteLine();
+
 		return s;
 	}
 
@@ -131,7 +153,6 @@ public class BitSolution
 
 		BitSolution best = null;
 		double maxScore = Double.NegativeInfinity;
-		Console.Error.WriteLine(closed.Count);
 		foreach (var s in closed)
 		{
 			if (s.score > maxScore)
@@ -141,7 +162,6 @@ public class BitSolution
 			}
 		}
 
-		Console.Error.WriteLine(best);
 		return best;
 	}
 }

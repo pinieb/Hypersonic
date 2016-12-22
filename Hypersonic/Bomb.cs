@@ -30,10 +30,8 @@
 		clone.owner = this.owner;
 		clone.param1 = this.param1;
 		clone.param2 = this.param2;
-		clone.x = this.x;
-		clone.y = this.y;
+		clone.position = this.position;
 
 		return clone;
 	}
 }
-

@@ -50,10 +50,7 @@
     <Compile Include="Bomb.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="Move.cs" />
-    <Compile Include="Solution.cs" />
-    <Compile Include="GameState.cs" />
     <Compile Include="BitState.cs" />
-    <Compile Include="Bitmaps.cs" />
     <Compile Include="BitSolution.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

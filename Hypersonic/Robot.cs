@@ -37,73 +37,12 @@ public class Robot : Unit
 		clone.owner = this.owner;
 		clone.param1 = this.param1;
 		clone.param2 = this.param2;
-		clone.x = this.x;
-		clone.y = this.y;
+		clone.position = this.position;
 		clone.maxBombs = this.maxBombs;
 		clone.isAlive = this.isAlive;
 		clone.boxesDestroyed = this.boxesDestroyed;
 
 		return clone;
-	}
-
-	public List<Move> getMoves(char[,] map)
-	{
-		var types = new List<MoveType>();
-		var directions = new List<MoveDirection>();
-
-		types.Add(MoveType.Move);
-		if (this.bombs > 0 && map[this.x, this.y] != Constants.MAP_BOMB)
-		{
-			types.Add(MoveType.Bomb);
-		}
-
-		directions.Add(MoveDirection.Stay);
-		if (this.x - 1 >= 0)
-		{
-			var cell = map[this.x - 1, this.y];
-			if (cell == Constants.MAP_FLOOR || cell == Constants.MAP_ITEM_RANGE || cell == Constants.MAP_ITEM_BOMB)
-			{
-				directions.Add(MoveDirection.Left);
-			}
-		}
-
-		if (this.x + 1 < map.GetLength(0))
-		{
-			var cell = map[this.x + 1, this.y];
-			if (cell == Constants.MAP_FLOOR || cell == Constants.MAP_ITEM_RANGE || cell == Constants.MAP_ITEM_BOMB)
-			{
-				directions.Add(MoveDirection.Right);
-			}
-		}
-
-		if (this.y - 1 >= 0)
-		{
-			var cell = map[this.x, this.y - 1];
-			if (cell == Constants.MAP_FLOOR || cell == Constants.MAP_ITEM_RANGE || cell == Constants.MAP_ITEM_BOMB)
-			{
-				directions.Add(MoveDirection.Up);
-			}
-		}
-
-		if (this.y + 1 < map.GetLength(1))
-		{
-			var cell = map[this.x, this.y + 1];
-			if (cell == Constants.MAP_FLOOR || cell == Constants.MAP_ITEM_RANGE || cell == Constants.MAP_ITEM_BOMB)
-			{
-				directions.Add(MoveDirection.Down);
-			}
-		}
-
-		var moves = new List<Move>();
-		foreach (MoveType t in types)
-		{
-			foreach (MoveDirection d in directions)
-			{
-				moves.Add(new Move(t, d));
-			}
-		}
-
-		return moves;
 	}
 
 	public Bomb makeBomb()
@@ -112,8 +51,6 @@ public class Robot : Unit
 		b.countDown = Constants.BOMB_TIMER;
 		b.range = this.bombRange;
 		b.owner = this.owner;
-		b.x = this.x;
-		b.y = this.y;
 		b.position = this.position;
 
 		this.bombs--;
@@ -123,8 +60,9 @@ public class Robot : Unit
 
 	public void getCommand(Move move)
 	{
-		int comx = this.x;
-		int comy = this.y;
+		var mapPos = BitState.GetMapIndex(this.position);
+		int comx = mapPos.Item1;
+		int comy = mapPos.Item2;
 
 		switch (move.direction)
 		{
