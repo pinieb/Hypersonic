@@ -18,6 +18,9 @@ public class Player
 		int height = int.Parse(inputs[1]);
 		int myId = int.Parse(inputs[2]);
 
+		BitMaps.GenerateMoves();
+		BitMaps.GenerateBombs();
+
 		// game loop
 		while (true)
 		{
@@ -84,8 +87,10 @@ public class Player
 
 			var best = BitSolution.generateBestRandomSolution(bgs, myId, 20, 80);
 
+			Console.WriteLine(bgs.getBot(myId).getCommand(best.moves[0]) + " " + best.score);
+
 			bgs.play(best.moves[0], myId);
-			bgs.getBot(myId).getCommand(best.moves[0]);
+			Console.Error.WriteLine(bgs.score(myId));
 		}
 	}
 }

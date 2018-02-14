@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.IO;
 
 public class BitState
 {
-	public const int BoardWidth = 13;
-	public const int BoardHeight = 11;
-	public const int PlayableSquares = 113;
-	public const int MaxPlayers = 4;
-	public const int BoxTypes = 3;
-	public const int ItemTypes = 2;
-	public BitArray[] boxes = new BitArray[BoxTypes];
-	public BitArray[] items = new BitArray[ItemTypes];
+	public BitArray[] boxes = new BitArray[Constants.BoxTypes];
+	public BitArray[] items = new BitArray[Constants.ItemTypes];
 	//public BitArray[] playerMaps = new BitArray[MaxPlayers];
-	public BitArray[] bombMap = new BitArray[MaxPlayers];
+	public BitArray[] bombMap = new BitArray[Constants.MaxPlayers];
 	public List<Robot> bots;
 	public List<Bomb> bombs;
 	public int turnNumber;
@@ -32,31 +27,31 @@ public class BitState
 		this.bots = bots;
 		this.bombs = bombs;
 
-		for (int i = 0; i < BoxTypes; i++)
+		for (int i = 0; i < Constants.BoxTypes; i++)
 		{
-			this.boxes[i] = new BitArray(PlayableSquares);
+			boxes[i] = new BitArray(Constants.PlayableSquares);
 		}
 
-		for (int i = 0; i < ItemTypes; i++)
+		for (int i = 0; i < Constants.ItemTypes; i++)
 		{
-			this.items[i] = new BitArray(PlayableSquares);
+			items[i] = new BitArray(Constants.PlayableSquares);
 		}
 
-		for (int i = 0; i < MaxPlayers; i++)
+		for (int i = 0; i < Constants.MaxPlayers; i++)
 		{
 			//this.playerMaps[i] = new BitArray(PlayableSquares);
-			this.bombMap[i] = new BitArray(PlayableSquares);
+			bombMap[i] = new BitArray(Constants.PlayableSquares);
 		}
 
 		foreach (Bomb bomb in bombs)
 		{
-			this.bombMap[bomb.owner][bomb.position] = true;
+			bombMap[bomb.owner][bomb.position] = true;
 		}
 
 		int index = 0;
-		for (int j = 0; j < BoardHeight; j++)
+		for (int j = 0; j < Constants.BoardHeight; j++)
 		{
-			for (int i = 0; i < BoardWidth; i++)
+			for (int i = 0; i < Constants.BoardWidth; i++)
 			{
 				if (i % 2 == 1 && j % 2 == 1)
 				{
@@ -66,23 +61,23 @@ public class BitState
 
 				if (map[i, j] == Constants.MAP_BOX)
 				{
-					this.boxes[0][GetBitIndex(i, j)] = true;
+					boxes[0][GetBitIndex(i, j)] = true;
 				}
 				else if (map[i, j] == Constants.MAP_BOX_RANGE)
 				{
-					this.boxes[1][GetBitIndex(i, j)] = true;
+					boxes[1][GetBitIndex(i, j)] = true;
 				}
 				else if (map[i, j] == Constants.MAP_BOX_BOMB)
 				{
-					this.boxes[2][GetBitIndex(i, j)] = true;
+					boxes[2][GetBitIndex(i, j)] = true;
 				}
 				else if (map[i, j] == Constants.MAP_ITEM_RANGE)
 				{
-					this.items[0][GetBitIndex(i, j)] = true;
+					items[0][GetBitIndex(i, j)] = true;
 				}
 				else if (map[i, j] == Constants.MAP_ITEM_BOMB)
 				{
-					this.items[1][GetBitIndex(i, j)] = true;
+					items[1][GetBitIndex(i, j)] = true;
 				}
 
 				index++;
@@ -93,50 +88,58 @@ public class BitState
 	public BitState Clone()
 	{
 		var clone = new BitState();
-		clone.bots = this.bots.ConvertAll(e => e.Clone());
-		clone.bombs = this.bombs.ConvertAll(b => b.Clone());
+		clone.bots = bots.ConvertAll(e => e.Clone());
+		clone.bombs = bombs.ConvertAll(b => b.Clone());
 
-		for (int i = 0; i < BoxTypes; i++)
+		for (int i = 0; i < Constants.BoxTypes; i++)
 		{
-			clone.boxes[i] = new BitArray(this.boxes[i]);
+			clone.boxes[i] = new BitArray(boxes[i]);
 		}
 
-		for (int i = 0; i < ItemTypes; i++)
+		for (int i = 0; i < Constants.ItemTypes; i++)
 		{
-			clone.items[i] = new BitArray(this.items[i]);
+			clone.items[i] = new BitArray(items[i]);
 		}
 
-		for (int i = 0; i < MaxPlayers; i++)
+		for (int i = 0; i < Constants.MaxPlayers; i++)
 		{
 			//clone.playerMaps[i] = new BitArray(this.playerMaps[i]);
-			clone.bombMap[i] = new BitArray(this.bombMap[i]);
+			clone.bombMap[i] = new BitArray(bombMap[i]);
 		}
 
-		clone.turnNumber = this.turnNumber;
-		clone.lastComputedScore = this.lastComputedScore;
-		clone.lastScoreComputation = this.lastScoreComputation;
+		clone.turnNumber = turnNumber;
+		clone.lastComputedScore = lastComputedScore;
+		clone.lastScoreComputation = lastScoreComputation;
 
 		return clone;
 	}
 
 	public Robot getBot(int id)
 	{
-		return this.bots.FirstOrDefault(x => x.owner == id);
+		return bots.FirstOrDefault(x => x.owner == id);
+	}
+
+	public void play(BitSolution s, int playerId)
+	{
+		foreach (Move m in s.moves)
+		{
+			play(m, playerId);
+		}
 	}
 
 	public void play(Move move, int playerId)
 	{
-		this.tick();
+		tick();
 
-		var bot = this.getBot(playerId);
+		var bot = getBot(playerId);
 
-		this.handleExplosions();
+		handleExplosions();
 
 		// place bomb if necessary
 		if (move.type == MoveType.Bomb)
 		{
-			this.bombMap[playerId][bot.position] = true;
-			this.bombs.Add(bot.makeBomb());
+			bombMap[playerId][bot.position] = true;
+			bombs.Add(bot.makeBomb());
 		}
 
 		// move
@@ -177,9 +180,9 @@ public class BitState
 		}
 
 		int index = -1;
-		for (int j = 0; j < BoardHeight; j++)
+		for (int j = 0; j < Constants.BoardHeight; j++)
 		{
-			for (int i = 0; i < BoardWidth; i++)
+			for (int i = 0; i < Constants.BoardWidth; i++)
 			{
 				if (i % 2 == 1 && j % 2 == 1)
 				{
@@ -204,9 +207,9 @@ public class BitState
 		int x = 0;
 		int y = 0;
 
-		for (int j = 0; j < BoardHeight && index >= 0; j++)
+		for (int j = 0; j < Constants.BoardHeight && index >= 0; j++)
 		{
-			for (int i = 0; i < BoardWidth && index >= 0; i++)
+			for (int i = 0; i < Constants.BoardWidth && index >= 0; i++)
 			{
 				y = j;
 				x = i;
@@ -226,29 +229,29 @@ public class BitState
 	public void printMap()
 	{
 		int index = 0;
-		for (int j = 0; j < BoardHeight; j++)
+		for (int j = 0; j < Constants.BoardHeight; j++)
 		{
-			for (int i = 0; i < BoardWidth; i++)
+			for (int i = 0; i < Constants.BoardWidth; i++)
 			{
 				if (i % 2 == 0 || j % 2 == 0)
 				{
-					if (this.boxes[0][index])
+					if (boxes[0][index])
 					{
 						Console.Error.Write(Constants.MAP_BOX);
 					}
-					else if (this.boxes[1][index])
+					else if (boxes[1][index])
 					{
 						Console.Error.Write(Constants.MAP_BOX_RANGE);
 					}
-					else if (this.boxes[2][index])
+					else if (boxes[2][index])
 					{
 						Console.Error.Write(Constants.MAP_BOX_BOMB);
 					}
-					else if (this.items[0][index])
+					else if (items[0][index])
 					{
 						Console.Error.Write(Constants.MAP_ITEM_RANGE);
 					}
-					else if (this.items[1][index])
+					else if (items[1][index])
 					{
 						Console.Error.Write(Constants.MAP_ITEM_BOMB);
 					}
@@ -271,25 +274,30 @@ public class BitState
 
 	public void handleExplosions()
 	{
+		var timer = new Stopwatch();
+		timer.Start();
+		var movesTimer = new Stopwatch();
 		var exploded = new List<Bomb>();
 		var destroyedBoxes = new List<BitArray>();
 		var destroyedItems = new List<BitArray>();
 
-		List<Bomb> toExplode = this.bombs.Where(bomb => bomb.countDown <= 0).ToList();
+		List<Bomb> toExplode = bombs.Where(bomb => bomb.countDown <= 0).ToList();
 
 		while (toExplode.Count > 0)
 		{
 			var b = toExplode[0];
+			var owner = getBot(b.owner);
 			if (exploded.Contains(b))
 			{
 				toExplode.RemoveAt(0);
 				continue;
 			}
 
-			foreach (Robot r in this.bots)
+			foreach (Robot r in bots)
 			{
 				if (r.position == b.position)
 				{
+					r.hitBy = b;
 					r.isAlive = false;
 				}
 			}
@@ -298,125 +306,153 @@ public class BitState
 			bool continueRight = true;
 			bool continueUp = true;
 			bool continueDown = true;
-			for (int i = 1; i < b.range; i++)
+			for (int i = 0; i < b.range; i++)
 			{
 				if (continueLeft)
 				{
-					var l = BitState.GenerateMoveMap(b.position, MoveDirection.Left, i);
+					movesTimer.Start();
+					var l = BitMaps.bombLeft[i, b.position];
+					movesTimer.Stop();
 
-					var hits = this.getBombHits(l);
+					var hits = getBombHits(l);
 					if (hits.Count > 0)
 					{
 						toExplode.AddRange(hits);
 						continueLeft = false;
 					}
 
-					var boxHits = this.getBoxHits(l);
+					var boxHits = getBoxHits(l);
 					if (boxHits.Count > 0)
 					{
+						if (owner != null)
+						{
+							owner.boxesDestroyed += boxHits.Count;
+						}
 						destroyedBoxes.AddRange(boxHits);
 						continueLeft = false;
 					}
 
-					var itemHits = this.getItemHits(l);
+					var itemHits = getItemHits(l);
 					if (itemHits.Count > 0)
 					{
 						destroyedItems.AddRange(itemHits);
 						continueLeft = false;
 					}
 
-					foreach (var bot in this.getPlayerHits(l))
+					foreach (var bot in getPlayerHits(l))
 					{
+						bot.hitBy = b;
 						bot.isAlive = false;
 					}
 				}
 
 				if (continueRight)
 				{
-					var r = BitState.GenerateMoveMap(b.position, MoveDirection.Right, i);
-					var hits = this.getBombHits(r);
+					movesTimer.Start();
+					var r = BitMaps.bombRight[i, b.position];
+					movesTimer.Stop();
+					var hits = getBombHits(r);
 					if (hits.Count > 0)
 					{
 						toExplode.AddRange(hits);
 						continueRight = false;
 					}
 
-					var boxHits = this.getBoxHits(r);
+					var boxHits = getBoxHits(r);
 					if (boxHits.Count > 0)
 					{
+						if (owner != null)
+						{
+							owner.boxesDestroyed += boxHits.Count;
+						}
 						destroyedBoxes.AddRange(boxHits);
 						continueRight = false;
 					}
 
-					var itemHits = this.getItemHits(r);
+					var itemHits = getItemHits(r);
 					if (itemHits.Count > 0)
 					{
 						destroyedItems.AddRange(itemHits);
 						continueRight = false;
 					}
 
-					foreach (var bot in this.getPlayerHits(r))
+					foreach (var bot in getPlayerHits(r))
 					{
+						bot.hitBy = b;
 						bot.isAlive = false;
 					}
 				}
 
 				if (continueUp)
 				{
-					var u = BitState.GenerateMoveMap(b.position, MoveDirection.Up, i);
-					var hits = this.getBombHits(u);
+					movesTimer.Start();
+					var u = BitMaps.bombUp[i, b.position];
+					movesTimer.Stop();
+					var hits = getBombHits(u);
 					if (hits.Count > 0)
 					{
 						toExplode.AddRange(hits);
 						continueUp = false;
 					}
 
-					var boxHits = this.getBoxHits(u);
+					var boxHits = getBoxHits(u);
 					if (boxHits.Count > 0)
 					{
+						if (owner != null)
+						{
+							owner.boxesDestroyed += boxHits.Count;
+						}
 						destroyedBoxes.AddRange(boxHits);
 						continueUp = false;
 					}
 
-					var itemHits = this.getItemHits(u);
+					var itemHits = getItemHits(u);
 					if (itemHits.Count > 0)
 					{
 						destroyedItems.AddRange(itemHits);
 						continueUp = false;
 					}
 
-					foreach (var bot in this.getPlayerHits(u))
+					foreach (var bot in getPlayerHits(u))
 					{
+						bot.hitBy = b;
 						bot.isAlive = false;
 					}
 				}
 
 				if (continueDown)
 				{
-					var d = BitState.GenerateMoveMap(b.position, MoveDirection.Down, i);
-					var hits = this.getBombHits(d);
+					movesTimer.Start();
+					var d = BitMaps.bombDown[i, b.position];
+					movesTimer.Stop();
+					var hits = getBombHits(d);
 					if (hits.Count > 0)
 					{
 						toExplode.AddRange(hits);
 						continueDown = false;
 					}
 
-					var boxHits = this.getBoxHits(d);
+					var boxHits = getBoxHits(d);
 					if (boxHits.Count > 0)
 					{
+						if (owner != null)
+						{
+							owner.boxesDestroyed += boxHits.Count;
+						}
 						destroyedBoxes.AddRange(boxHits);
 						continueDown = false;
 					}
 
-					var itemHits = this.getItemHits(d);
+					var itemHits = getItemHits(d);
 					if (itemHits.Count > 0)
 					{
 						destroyedItems.AddRange(itemHits);
 						continueDown = false;
 					}
 
-					foreach (var bot in this.getPlayerHits(d))
+					foreach (var bot in getPlayerHits(d))
 					{
+						bot.hitBy = b;
 						bot.isAlive = false;
 					}
 				}
@@ -428,9 +464,9 @@ public class BitState
 
 		foreach (Bomb b in exploded)
 		{
-			this.bombs.Remove(b);
+			bombs.Remove(b);
 
-			foreach (Robot r in this.bots)
+			foreach (Robot r in bots)
 			{
 				if (b.owner == r.owner)
 				{
@@ -438,78 +474,83 @@ public class BitState
 				}
 			}
 
-			this.bombMap[b.owner][b.position] = false;
+			bombMap[b.owner][b.position] = false;
 		}
 
 		foreach (BitArray b in destroyedBoxes)
 		{
-			for (int i = 0; i < BoxTypes; i++)
+			for (int i = 0; i < Constants.BoxTypes; i++)
 			{
-				this.boxes[i].Xor(b);
-			}
-
-			for (int i = 0; i < ItemTypes; i++)
-			{
-				this.items[i].Or(b);
+				var temp = boxes[i];
+				temp.And(b);
+				boxes[i].Xor(b);
+				if (i != 0)
+				{
+					items[i - 1].Or(temp);
+				}
 			}
 		}
 
 		foreach (BitArray i in destroyedItems)
 		{
-			foreach (BitArray itemMap in this.items)
+			foreach (BitArray itemMap in items)
 			{
 				itemMap.Xor(i);
 			}
 		}
+
+		timer.Stop();
+		//Console.Error.WriteLine("{0} ticks spent generating moves", movesTimer.ElapsedTicks);
+		//Console.Error.WriteLine("{0} ticks total", timer.ElapsedTicks);
 	}
-
-	//public List<Move> getMoves(int playerId)
-	//{
-	//	var bot = this.getBot(playerId);
-	//	var moves = new List<Move>();
-
-	//	var directions = new BitArray[] { BitState.GenerateMoveMap(bot.position, MoveDirection.Up, 1), BitState.GenerateMoveMap(bot.position, MoveDirection.Down, 1), BitState.GenerateMoveMap(bot.position, MoveDirection.Left, 1), BitState.GenerateMoveMap(bot.position, MoveDirection.Right, 1) };
-
-	//	for (int i = 0; i < 4; i++)
-	//	{
-	//		if (directions[i].Cast<bool>().Where(x => x == true).Count() != 2)
-	//		{
-	//			continue;
-	//		}
-
-	//		if (getBombHits(directions[i]).Count > 0)
-	//		{
-	//			continue;
-	//		}
-
-	//		if (getBoxHits(directions[i]).Count > 0)
-	//		{
-	//			continue;
-	//		}
-
-	//		if (bot.bombs > 0)
-	//		{
-	//			moves.Add(new Move(MoveType.Bomb, (MoveDirection) i));
-	//		}
-
-	//		moves.Add(new Move(MoveType.Move, (MoveDirection) i));
-	//	}
-
-
-	//	if (bot.bombs > 0)
-	//	{
-	//		moves.Add(new Move(MoveType.Bomb, MoveDirection.Stay));
-	//	}
-
-	//	moves.Add(new Move(MoveType.Move, MoveDirection.Stay));
-
-	//	return moves;
-	//}
 
 	public List<Move> getMoves(int playerId)
 	{
-		var moves = new List<Move>();
 		var bot = this.getBot(playerId);
+		var moves = new List<Move>();
+
+		var directions = new BitArray[] { BitMaps.moveUp[bot.position], BitMaps.moveDown[bot.position], BitMaps.moveLeft[bot.position], BitMaps.moveRight[bot.position] };
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (directions[i].Cast<bool>().Where(x => x == true).Count() != 2)
+			{
+				continue;
+			}
+
+			if (getBombHits(directions[i]).Count > 0)
+			{
+				continue;
+			}
+
+			if (getBoxHits(directions[i]).Count > 0)
+			{
+				continue;
+			}
+
+			if (bot.bombs > 0)
+			{
+				moves.Add(new Move(MoveType.Bomb, (MoveDirection) i));
+			}
+
+			moves.Add(new Move(MoveType.Move, (MoveDirection) i));
+		}
+
+
+		if (bot.bombs > 0)
+		{
+			moves.Add(new Move(MoveType.Bomb, MoveDirection.Stay));
+		}
+
+		moves.Add(new Move(MoveType.Move, MoveDirection.Stay));
+
+		return moves;
+	}
+
+	public List<Move> getMoves2(int playerId)
+	{
+		var moves = new List<Move>();
+		var bot = getBot(playerId);
 
 		var directions = new int[]{ bot.up(), bot.down(), bot.left(), bot.right() };
 
@@ -521,10 +562,10 @@ public class BitState
 			}
 
 			bool hitBomb = false;
-			for (int p = 0; p < MaxPlayers; p++)
+			for (int p = 0; p < Constants.MaxPlayers; p++)
 			{
 				// check player bombs
-				if (this.bombMap[p][directions[i]])
+				if (bombMap[p][directions[i]])
 				{
 					hitBomb = true;
 				}
@@ -536,10 +577,10 @@ public class BitState
 			}
 
 			bool hitBox = false;
-			for (int p = 0; p < BoxTypes; p++)
+			for (int p = 0; p < Constants.BoxTypes; p++)
 			{
 				// check player bombs
-				if (this.boxes[p][directions[i]])
+				if (boxes[p][directions[i]])
 				{
 					hitBox = true;
 				}
@@ -572,14 +613,14 @@ public class BitState
 	{
 		var hits = new List<Bomb>();
 
-		for (int p = 0; p < MaxPlayers; p++)
+		for (int p = 0; p < Constants.MaxPlayers; p++)
 		{
 			// check player bombs
-			var hit = new BitArray(mask).And(this.bombMap[p]);
+			var hit = new BitArray(mask).And(bombMap[p]);
 			if (hit.Cast<bool>().Contains(true))
 			{
 				// find bombs that got hit
-				hits.AddRange(this.bombs.Where(b => b.position == this.getPosition(hit)));
+				hits.AddRange(bombs.Where(b => b.position == getPosition(hit)));
 			}
 		}
 
@@ -590,9 +631,9 @@ public class BitState
 	{
 		var hits = new List<BitArray>();
 
-		for (int p = 0; p < BoxTypes; p++)
+		for (int p = 0; p < Constants.BoxTypes; p++)
 		{
-			var hit = new BitArray(mask).And(this.boxes[p]);
+			var hit = new BitArray(mask).And(boxes[p]);
 			if (hit.Cast<bool>().Contains(true))
 			{
 				hits.Add(hit);
@@ -607,9 +648,9 @@ public class BitState
 	{
 		var hits = new List<BitArray>();
 
-		for (int p = 0; p < ItemTypes; p++)
+		for (int p = 0; p < Constants.ItemTypes; p++)
 		{
-			var hit = new BitArray(mask).And(this.items[p]);
+			var hit = new BitArray(mask).And(items[p]);
 			if (hit.Cast<bool>().Contains(true))
 			{
 				hits.Add(hit);
@@ -624,7 +665,7 @@ public class BitState
 	{
 		var hits = new List<Robot>();
 
-		foreach (Robot r in this.bots)
+		foreach (Robot r in bots)
 		{
 			if (mask[r.position])
 			{
@@ -637,12 +678,12 @@ public class BitState
 
 	private void tick()
 	{
-		foreach (Bomb b in this.bombs)
+		foreach (Bomb b in bombs)
 		{
 			b.countDown--;
 		}
 
-		this.turnNumber++;
+		turnNumber++;
 	}
 
 	private int getPosition(BitArray array)
@@ -672,7 +713,7 @@ public class BitState
 
 	private static BitArray GenerateMoveMap(int position, MoveDirection direction, int range)
 	{
-		var map = new BitArray(PlayableSquares);
+		var map = new BitArray(Constants.PlayableSquares);
 
 		if (direction == MoveDirection.Stay)
 		{
@@ -686,7 +727,7 @@ public class BitState
 		switch (direction)
 		{
 			case MoveDirection.Right:
-				if (mapPos.Item1 + range < BoardWidth && mapPos.Item2 % 2 == 0)
+				if (mapPos.Item1 + range < Constants.BoardWidth && mapPos.Item2 % 2 == 0)
 				{
 					map[position + range] = true;
 				}
@@ -707,7 +748,7 @@ public class BitState
 				break;
 
 			case MoveDirection.Down:
-				if (mapPos.Item2 + range < BoardHeight && mapPos.Item1 % 2 == 0)
+				if (mapPos.Item2 + range < Constants.BoardHeight && mapPos.Item1 % 2 == 0)
 				{
 					map[GetBitIndex(mapPos.Item1, mapPos.Item2 + range)] = true;
 				}
@@ -722,37 +763,47 @@ public class BitState
 
 	public double score(int playerId)
 	{
-		var bot = this.getBot(playerId);
-		if (this.lastScoreComputation == this.turnNumber)
+		//var bot = getBot(playerId);
+		if (lastScoreComputation == turnNumber)
 		{
-			return this.lastComputedScore;
+			return lastComputedScore;
 		}
+
+		var lookahead = Clone();
+		var stay = new Move(MoveType.Move, MoveDirection.Stay);
+		for (int i = 0; i < 8; i++)
+		{
+			lookahead.play(stay, playerId);
+		}
+
+		var bot = lookahead.getBot(playerId);
 
 		if (!bot.isAlive)
 		{
-			this.lastScoreComputation = this.turnNumber;
-			this.lastComputedScore = -8000000;
-			return this.lastComputedScore;
+			//Console.Error.WriteLine("Hit by bomb @ {0}", bot.hitBy.position);
+			lastScoreComputation = turnNumber;
+			lastComputedScore = -8000000;
+			return lastComputedScore;
 		}
 
-		double score = 0;
+		double s = 0;
 
 		foreach (var b in bots)
 		{
 			if (b.owner == playerId)
 			{
-				score += 7 * bot.boxesDestroyed;
+				s += 7 * b.boxesDestroyed;
 			}
 			else
 			{
-				score -= 7 * bot.boxesDestroyed;
+				s -= 7 * b.boxesDestroyed;
 			}
-
-			score += bot.bombRange + bot.maxBombs;
 		}
 
-		this.lastScoreComputation = this.turnNumber;
-		this.lastComputedScore = score;
-		return this.lastComputedScore;
+		s += bot.bombRange + bot.maxBombs;
+
+		lastScoreComputation = turnNumber;
+		lastComputedScore = s;
+		return lastComputedScore;
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 public class Robot : Unit
@@ -7,15 +6,18 @@ public class Robot : Unit
 	public bool isAlive = true;
 	public int boxesDestroyed = 0;
 	public int maxBombs = 1;
+
+	public Bomb hitBy = null;
+
 	public int bombs
 	{
 		get
 		{
-			return this.param1;
+			return param1;
 		}
 		set
 		{
-			this.param1 = value;
+			param1 = value;
 		}
 	}
 
@@ -23,24 +25,24 @@ public class Robot : Unit
 	{
 		get
 		{
-			return this.param2;
+			return param2;
 		}
 		set
 		{
-			this.param2 = value;
+			param2 = value;
 		}
 	}
 
 	public Robot Clone()
 	{
 		var clone = new Robot();
-		clone.owner = this.owner;
-		clone.param1 = this.param1;
-		clone.param2 = this.param2;
-		clone.position = this.position;
-		clone.maxBombs = this.maxBombs;
-		clone.isAlive = this.isAlive;
-		clone.boxesDestroyed = this.boxesDestroyed;
+		clone.owner = owner;
+		clone.param1 = param1;
+		clone.param2 = param2;
+		clone.position = position;
+		clone.maxBombs = maxBombs;
+		clone.isAlive = isAlive;
+		clone.boxesDestroyed = boxesDestroyed;
 
 		return clone;
 	}
@@ -49,18 +51,18 @@ public class Robot : Unit
 	{
 		var b = new Bomb();
 		b.countDown = Constants.BOMB_TIMER;
-		b.range = this.bombRange;
-		b.owner = this.owner;
-		b.position = this.position;
+		b.range = bombRange;
+		b.owner = owner;
+		b.position = position;
 
-		this.bombs--;
+		bombs--;
 
 		return b;
 	}
 
-	public void getCommand(Move move)
+	public string getCommand(Move move)
 	{
-		var mapPos = BitState.GetMapIndex(this.position);
+		var mapPos = BitState.GetMapIndex(position);
 		int comx = mapPos.Item1;
 		int comy = mapPos.Item2;
 
@@ -85,11 +87,11 @@ public class Robot : Unit
 
 		if (move.type == MoveType.Move)
 		{
-			Console.WriteLine("MOVE {0} {1}", comx, comy);
+			return "MOVE " + comx + " " + comy;
 		}
 		else
 		{
-			Console.WriteLine("BOMB {0} {1}", comx, comy);
+			return "BOMB " + comx + " " + comy;
 		}
 	}
 }

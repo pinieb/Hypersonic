@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{88547D1A-CDAA-42FA-AF4D-F55E8DCFB164}</ProjectGuid>
+    <ProjectGuid>{E8DC01D7-A13D-4D6F-9F11-49907CCD864A}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Hypersonic</RootNamespace>
-    <AssemblyName>Hypersonic</AssemblyName>
+    <RootNamespace>HypersonicConsole</RootNamespace>
+    <AssemblyName>HypersonicConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -19,16 +19,6 @@
     <WarningLevel>4</WarningLevel>
     <ExternalConsole>true</ExternalConsole>
     <PlatformTarget>x86</PlatformTarget>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>/users/petebiencourt/CodinGame/package.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-          <externalConsole>True</externalConsole>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
@@ -44,15 +34,12 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Unit.cs" />
-    <Compile Include="Robot.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Bomb.cs" />
-    <Compile Include="Box.cs" />
-    <Compile Include="Move.cs" />
-    <Compile Include="BitState.cs" />
-    <Compile Include="BitSolution.cs" />
-    <Compile Include="BitMaps.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hypersonic\Hypersonic.csproj">
+      <Project>{88547D1A-CDAA-42FA-AF4D-F55E8DCFB164}</Project>
+      <Name>Hypersonic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

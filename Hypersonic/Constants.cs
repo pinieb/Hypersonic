@@ -17,4 +17,11 @@
 	public const int ITEM_BOMB = 2;
 
 	public const int BOMB_TIMER = 8;
+
+	public const int BoardWidth = 13;
+	public const int BoardHeight = 11;
+	public const int PlayableSquares = 113;
+	public const int MaxPlayers = 4;
+	public const int BoxTypes = 3;
+	public const int ItemTypes = 2;
 }

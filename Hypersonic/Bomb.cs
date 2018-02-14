@@ -4,11 +4,11 @@
 	{
 		get
 		{
-			return this.param1;
+			return param1;
 		}
 		set
 		{
-			this.param1 = value;
+			param1 = value;
 		}
 	}
 
@@ -16,21 +16,21 @@
 	{
 		get
 		{
-			return this.param2;
+			return param2;
 		}
 		set
 		{
-			this.param2 = value;
+			param2 = value;
 		}
 	}
 
 	public Bomb Clone()
 	{
 		var clone = new Bomb();
-		clone.owner = this.owner;
-		clone.param1 = this.param1;
-		clone.param2 = this.param2;
-		clone.position = this.position;
+		clone.owner = owner;
+		clone.param1 = param1;
+		clone.param2 = param2;
+		clone.position = position;
 
 		return clone;
 	}

@@ -25,7 +25,7 @@ public class BitSolution
 	public static BitSolution generateBestRandomSolution(BitState g, int playerId, int depth, int timeToRun)
 	{
 		BitSolution best = null;
-		double maxScore = Double.NegativeInfinity;
+		double maxScore = double.NegativeInfinity;
 		int count = 0;
 
 		var timer = new Stopwatch();
@@ -54,7 +54,7 @@ public class BitSolution
 	public BitSolution Clone()
 	{
 		var clone = new BitSolution();
-		clone.moves = this.moves.ConvertAll(m => new Move(m.type, m.direction));
+		clone.moves = moves.ConvertAll(m => new Move(m.type, m.direction));
 
 		return clone;
 	}
@@ -62,12 +62,12 @@ public class BitSolution
 	public override string ToString()
 	{
 		var s = "***\n";
-		foreach (Move m in this.moves)
+		foreach (Move m in moves)
 		{
 			s += m.ToString() + "\n";
 		}
 
-		s += "Score " + this.score + "\n";
+		s += "Score " + score + "\n";
 		s += "***\n";
 
 		return s;
@@ -89,7 +89,7 @@ public class BitSolution
 			//movesTimer.Start();
 			var moves = g.getMoves(playerId);
 			//movesTimer.Stop();
-			var move = moves[BitSolution.rnd.Next(moves.Count)];
+			var move = moves[rnd.Next(moves.Count)];
 			//playTimer.Start();
 			g.play(move, playerId);
 			//playTimer.Stop();
@@ -152,7 +152,7 @@ public class BitSolution
 		timer.Stop();
 
 		BitSolution best = null;
-		double maxScore = Double.NegativeInfinity;
+		double maxScore = double.NegativeInfinity;
 		foreach (var s in closed)
 		{
 			if (s.score > maxScore)
