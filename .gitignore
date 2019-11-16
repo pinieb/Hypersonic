@@ -38,3 +38,7 @@ Thumbs.db
 
 # dotCover
 *.dotCover
+.vs/Hypersonic/v16/Server/sqlite3/db.lock
+.vs/Hypersonic/v16/Server/sqlite3/storage.ide
+.vs/Hypersonic/v16/Server/sqlite3/storage.ide-shm
+.vs/Hypersonic/v16/Server/sqlite3/storage.ide-wal
