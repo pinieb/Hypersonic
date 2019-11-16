@@ -1,37 +1,42 @@
-﻿public class Bomb : Unit
+﻿namespace Hypersonic
 {
-	public int countDown
-	{
-		get
-		{
-			return param1;
-		}
-		set
-		{
-			param1 = value;
-		}
-	}
+    public class Bomb : Unit
+    {
+        public int countDown
+        {
+            get
+            {
+                return param1;
+            }
+            set
+            {
+                param1 = value;
+            }
+        }
 
-	public int range
-	{
-		get
-		{
-			return param2;
-		}
-		set
-		{
-			param2 = value;
-		}
-	}
+        public int range
+        {
+            get
+            {
+                return param2;
+            }
+            set
+            {
+                param2 = value;
+            }
+        }
 
-	public Bomb Clone()
-	{
-		var clone = new Bomb();
-		clone.owner = owner;
-		clone.param1 = param1;
-		clone.param2 = param2;
-		clone.position = position;
+        public Bomb Clone()
+        {
+            var clone = new Bomb
+            {
+                owner = owner,
+                param1 = param1,
+                param2 = param2,
+                position = position
+            };
 
-		return clone;
-	}
+            return clone;
+        }
+    }
 }

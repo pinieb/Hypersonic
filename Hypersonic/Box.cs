@@ -1,15 +1,20 @@
-﻿public class Box : Unit
+﻿namespace Hypersonic
 {
-	public char item = Constants.MAP_FLOOR;
+    public class Box : Unit
+    {
+        public char item = Constants.MAP_FLOOR;
 
-	public Box Clone()
-	{
-		var clone = new Box();
-		clone.owner = this.owner;
-		clone.param1 = this.param1;
-		clone.param2 = this.param2;
-		clone.position = this.position;
+        public Box Clone()
+        {
+            var clone = new Box
+            {
+                owner = this.owner,
+                param1 = this.param1,
+                param2 = this.param2,
+                position = this.position
+            };
 
-		return clone;
-	}
+            return clone;
+        }
+    }
 }

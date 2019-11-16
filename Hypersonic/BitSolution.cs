@@ -1,167 +1,172 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-public class BitSolution
+﻿namespace Hypersonic
 {
-	class Node
-	{
-		public BitSolution solution;
-		public BitSolution parent;
-		public BitState gameState;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 
-		public Node(BitSolution solution, BitSolution parent, BitState gameState)
-		{
-			this.solution = solution;
-			this.parent = parent;
-			this.gameState = gameState;
-		}
-	}
+    public class BitSolution
+    {
+        class Node
+        {
+            public BitSolution solution;
+            public BitSolution parent;
+            public BitState gameState;
 
-	public static Random rnd = new Random();
-	public List<Move> moves = new List<Move>();
-	public double score;
+            public Node(BitSolution solution, BitSolution parent, BitState gameState)
+            {
+                this.solution = solution;
+                this.parent = parent;
+                this.gameState = gameState;
+            }
+        }
 
-	public static BitSolution generateBestRandomSolution(BitState g, int playerId, int depth, int timeToRun)
-	{
-		BitSolution best = null;
-		double maxScore = double.NegativeInfinity;
-		int count = 0;
+        public static Random rnd = new Random();
+        public List<Move> moves = new List<Move>();
+        public double score;
 
-		var timer = new Stopwatch();
-		timer.Start();
-		while (timer.ElapsedMilliseconds <= timeToRun)
-		{
-			//var time = timer.ElapsedMilliseconds;
-			//Console.Error.WriteLine("Time elapsed: {0} ms", time);
-			var solution = randomSolution(g.Clone(), playerId, depth);
-			if (solution.score > maxScore)
-			{
-				maxScore = solution.score;
-				best = solution;
-			}
-			count++;
-			//time = timer.ElapsedMilliseconds;
-			//Console.Error.WriteLine("Time elapsed: {0} ms", time);
-		}
-		timer.Stop();
+        public static BitSolution generateBestRandomSolution(BitState g, int playerId, int depth, int timeToRun)
+        {
+            BitSolution best = null;
+            double maxScore = double.NegativeInfinity;
+            int count = 0;
 
-		Console.Error.WriteLine("{0} solutions considered", count);
+            var timer = new Stopwatch();
+            timer.Start();
+            while (timer.ElapsedMilliseconds <= timeToRun)
+            {
+                //var time = timer.ElapsedMilliseconds;
+                //Console.Error.WriteLine("Time elapsed: {0} ms", time);
+                var solution = randomSolution(g.Clone(), playerId, depth);
+                if (solution.score > maxScore)
+                {
+                    maxScore = solution.score;
+                    best = solution;
+                }
+                count++;
+                //time = timer.ElapsedMilliseconds;
+                //Console.Error.WriteLine("Time elapsed: {0} ms", time);
+            }
+            timer.Stop();
 
-		return best;
-	}
+            Console.Error.WriteLine("{0} solutions considered", count);
 
-	public BitSolution Clone()
-	{
-		var clone = new BitSolution();
-		clone.moves = moves.ConvertAll(m => new Move(m.type, m.direction));
+            return best;
+        }
 
-		return clone;
-	}
+        public BitSolution Clone()
+        {
+            var clone = new BitSolution
+            {
+                moves = moves.ConvertAll(m => new Move(m.type, m.direction))
+            };
 
-	public override string ToString()
-	{
-		var s = "***\n";
-		foreach (Move m in moves)
-		{
-			s += m.ToString() + "\n";
-		}
+            return clone;
+        }
 
-		s += "Score " + score + "\n";
-		s += "***\n";
+        public override string ToString()
+        {
+            var s = "***\n";
+            foreach (Move m in moves)
+            {
+                s += m.ToString() + "\n";
+            }
 
-		return s;
-	}
+            s += "Score " + score + "\n";
+            s += "***\n";
 
-	private static BitSolution randomSolution(BitState g, int playerId, int depth)
-	{
-		var movesTimer = new Stopwatch();
-		//var playTimer = new Stopwatch();
-		//var scoreTimer = new Stopwatch();
+            return s;
+        }
 
-		movesTimer.Start();
-		var s = new BitSolution();
-		movesTimer.Stop();
-		//Console.Error.WriteLine("Time to construct BitSolution: {0}", movesTimer.ElapsedMilliseconds);
+        private static BitSolution randomSolution(BitState g, int playerId, int depth)
+        {
+            var movesTimer = new Stopwatch();
+            //var playTimer = new Stopwatch();
+            //var scoreTimer = new Stopwatch();
 
-		for (int d = 0; d < depth; d++)
-		{
-			//movesTimer.Start();
-			var moves = g.getMoves(playerId);
-			//movesTimer.Stop();
-			var move = moves[rnd.Next(moves.Count)];
-			//playTimer.Start();
-			g.play(move, playerId);
-			//playTimer.Stop();
-			s.moves.Add(move);
+            movesTimer.Start();
+            var s = new BitSolution();
+            movesTimer.Stop();
+            //Console.Error.WriteLine("Time to construct BitSolution: {0}", movesTimer.ElapsedMilliseconds);
 
-			if (!g.getBot(playerId).isAlive)
-			{
-				break;
-			}
-		}
+            for (int d = 0; d < depth; d++)
+            {
+                //movesTimer.Start();
+                var moves = g.getMoves(playerId);
+                //movesTimer.Stop();
+                var move = moves[rnd.Next(moves.Count)];
+                //playTimer.Start();
+                g.play(move, playerId);
+                //playTimer.Stop();
+                s.moves.Add(move);
 
-		//scoreTimer.Start();
-		s.score = g.score(playerId);
-		//scoreTimer.Stop();
+                if (!g.getBot(playerId).isAlive)
+                {
+                    break;
+                }
+            }
 
-		//Console.Error.WriteLine("Moves: {0} ms", movesTimer.ElapsedMilliseconds);
-		//Console.Error.WriteLine("Play: {0} ms", playTimer.ElapsedMilliseconds);
-		//Console.Error.WriteLine("Score: {0} ms", scoreTimer.ElapsedMilliseconds);
-		//Console.Error.WriteLine();
+            //scoreTimer.Start();
+            s.score = g.score(playerId);
+            //scoreTimer.Stop();
 
-		return s;
-	}
+            //Console.Error.WriteLine("Moves: {0} ms", movesTimer.ElapsedMilliseconds);
+            //Console.Error.WriteLine("Play: {0} ms", playTimer.ElapsedMilliseconds);
+            //Console.Error.WriteLine("Score: {0} ms", scoreTimer.ElapsedMilliseconds);
+            //Console.Error.WriteLine();
 
-	public static BitSolution bfs(BitState g, int playerId, int timeToRun)
-	{
-		var timer = new Stopwatch();
-		timer.Start();
+            return s;
+        }
 
-		var open = new List<Node>();
-		var closed = new List<BitSolution>();
+        public static BitSolution bfs(BitState g, int playerId, int timeToRun)
+        {
+            var timer = new Stopwatch();
+            timer.Start();
 
-		open.Add(new Node(new BitSolution(), null, g.Clone()));
-		while (timer.ElapsedMilliseconds <= timeToRun && open.Count > 0)
-		{
-			var sol = open[0].solution;
-			var gs = open[0].gameState;
+            var open = new List<Node>();
+            var closed = new List<BitSolution>();
 
-			if (open[0].parent != null)
-			{
-				closed.Remove(open[0].parent);
-			}
+            open.Add(new Node(new BitSolution(), null, g.Clone()));
+            while (timer.ElapsedMilliseconds <= timeToRun && open.Count > 0)
+            {
+                var sol = open[0].solution;
+                var gs = open[0].gameState;
 
-			open.RemoveAt(0);
+                if (open[0].parent != null)
+                {
+                    closed.Remove(open[0].parent);
+                }
 
-			foreach (Move m in gs.getMoves(playerId))
-			{
-				var solClone = sol.Clone();
-				var gsClone = gs.Clone();
-				solClone.moves.Add(m);
-				gsClone.play(m, playerId);
+                open.RemoveAt(0);
 
-				if (gsClone.getBot(playerId).isAlive)
-				{
-					open.Add(new Node(solClone, sol, gsClone));
-				}
-			}
+                foreach (Move m in gs.getMoves(playerId))
+                {
+                    var solClone = sol.Clone();
+                    var gsClone = gs.Clone();
+                    solClone.moves.Add(m);
+                    gsClone.play(m, playerId);
 
-			closed.Add(sol);
-		}
-		timer.Stop();
+                    if (gsClone.getBot(playerId).isAlive)
+                    {
+                        open.Add(new Node(solClone, sol, gsClone));
+                    }
+                }
 
-		BitSolution best = null;
-		double maxScore = double.NegativeInfinity;
-		foreach (var s in closed)
-		{
-			if (s.score > maxScore)
-			{
-				maxScore = s.score;
-				best = s;
-			}
-		}
+                closed.Add(sol);
+            }
+            timer.Stop();
 
-		return best;
-	}
+            BitSolution best = null;
+            double maxScore = double.NegativeInfinity;
+            foreach (var s in closed)
+            {
+                if (s.score > maxScore)
+                {
+                    maxScore = s.score;
+                    best = s;
+                }
+            }
+
+            return best;
+        }
+    }
 }

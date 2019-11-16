@@ -1,96 +1,100 @@
-﻿using System;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-public class Player
+﻿namespace Hypersonic
 {
-	static void Main(string[] args)
-	{
-		int turnNumber = 0;
+    using System;
+    using System.Collections.Generic;
 
-		string[] inputs;
-		inputs = Console.ReadLine().Split(' ');
-		int width = int.Parse(inputs[0]);
-		int height = int.Parse(inputs[1]);
-		int myId = int.Parse(inputs[2]);
+    public class Player
+    {
+        static void Main()
+        {
+            int turnNumber = 0;
 
-		BitMaps.GenerateMoves();
-		BitMaps.GenerateBombs();
+            string[] inputs;
+            inputs = Console.ReadLine().Split(' ');
+            int width = int.Parse(inputs[0]);
+            int height = int.Parse(inputs[1]);
+            int myId = int.Parse(inputs[2]);
 
-		// game loop
-		while (true)
-		{
-			turnNumber++;
+            BitMaps.GenerateMoves();
+            BitMaps.GenerateBombs();
 
-			char[,] map = new char[width, height];
-			List<Robot> bots = new List<Robot>();
-			List<Bomb> bombs = new List<Bomb>();
+            // game loop
+            while (true)
+            {
+                turnNumber++;
 
-			for (int i = 0; i < height; i++)
-			{
-				var row = Console.ReadLine().ToCharArray();
-				for (int j = 0; j < width; j++)
-				{
-					map[j, i] = row[j];
-				}
-			}
+                char[,] map = new char[width, height];
+                List<Robot> bots = new List<Robot>();
+                List<Bomb> bombs = new List<Bomb>();
 
-			int entities = int.Parse(Console.ReadLine());
-			for (int i = 0; i < entities; i++)
-			{
-				inputs = Console.ReadLine().Split(' ');
+                for (int i = 0; i < height; i++)
+                {
+                    var row = Console.ReadLine().ToCharArray();
+                    for (int j = 0; j < width; j++)
+                    {
+                        map[j, i] = row[j];
+                    }
+                }
 
-				var entityType = int.Parse(inputs[0]);
-				if (entityType == Constants.ENTITY_ROBOT)
-				{
-					var r = new Robot();
-					r.owner = int.Parse(inputs[1]);
-					var x = int.Parse(inputs[2]);
-					var y = int.Parse(inputs[3]);
-					r.position = BitState.GetBitIndex(x, y);
-					r.param1 = int.Parse(inputs[4]);
-					r.param2 = int.Parse(inputs[5]);
+                int entities = int.Parse(Console.ReadLine());
+                for (int i = 0; i < entities; i++)
+                {
+                    inputs = Console.ReadLine().Split(' ');
 
-					bots.Add(r);
-				}
-				else if (entityType == Constants.ENTITY_ITEM)
-				{
-					if (int.Parse(inputs[4]) == Constants.ITEM_RANGE)
-					{
-						map[int.Parse(inputs[2]), int.Parse(inputs[3])] = Constants.MAP_ITEM_RANGE;
-					}
-					else
-					{
-						map[int.Parse(inputs[2]), int.Parse(inputs[3])] = Constants.MAP_ITEM_BOMB;
-					}
-				}
-				else
-				{
-					var r = new Bomb();
-					r.owner = int.Parse(inputs[1]);
-					var x = int.Parse(inputs[2]);
-					var y = int.Parse(inputs[3]);
-					r.position = BitState.GetBitIndex(x, y);
-					r.param1 = int.Parse(inputs[4]);
-					r.param2 = int.Parse(inputs[5]);
+                    var entityType = int.Parse(inputs[0]);
+                    if (entityType == Constants.ENTITY_ROBOT)
+                    {
+                        var r = new Robot
+                        {
+                            owner = int.Parse(inputs[1])
+                        };
 
-					bombs.Add(r);
-					map[x, y] = Constants.MAP_BOMB;
-				}
-			}
+                        var x = int.Parse(inputs[2]);
+                        var y = int.Parse(inputs[3]);
+                        r.position = BitState.GetBitIndex(x, y);
+                        r.param1 = int.Parse(inputs[4]);
+                        r.param2 = int.Parse(inputs[5]);
 
-			var bgs = new BitState(map, bots, bombs, turnNumber);
+                        bots.Add(r);
+                    }
+                    else if (entityType == Constants.ENTITY_ITEM)
+                    {
+                        if (int.Parse(inputs[4]) == Constants.ITEM_RANGE)
+                        {
+                            map[int.Parse(inputs[2]), int.Parse(inputs[3])] = Constants.MAP_ITEM_RANGE;
+                        }
+                        else
+                        {
+                            map[int.Parse(inputs[2]), int.Parse(inputs[3])] = Constants.MAP_ITEM_BOMB;
+                        }
+                    }
+                    else
+                    {
+                        var r = new Bomb
+                        {
+                            owner = int.Parse(inputs[1])
+                        };
 
-			var best = BitSolution.generateBestRandomSolution(bgs, myId, 20, 80);
+                        var x = int.Parse(inputs[2]);
+                        var y = int.Parse(inputs[3]);
+                        r.position = BitState.GetBitIndex(x, y);
+                        r.param1 = int.Parse(inputs[4]);
+                        r.param2 = int.Parse(inputs[5]);
 
-			Console.WriteLine(bgs.getBot(myId).getCommand(best.moves[0]) + " " + best.score);
+                        bombs.Add(r);
+                        map[x, y] = Constants.MAP_BOMB;
+                    }
+                }
 
-			bgs.play(best.moves[0], myId);
-			Console.Error.WriteLine(bgs.score(myId));
-		}
-	}
+                var bgs = new BitState(map, bots, bombs, turnNumber);
+
+                var best = BitSolution.generateBestRandomSolution(bgs, myId, 20, 80);
+
+                Console.WriteLine(bgs.getBot(myId).getCommand(best.moves[0]) + " " + best.score);
+
+                bgs.play(best.moves[0], myId);
+                Console.Error.WriteLine(bgs.score(myId));
+            }
+        }
+    }
 }

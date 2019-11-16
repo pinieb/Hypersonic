@@ -1,127 +1,129 @@
-﻿using System;
-using System.Collections;
-
-public class BitMaps
+﻿namespace Hypersonic
 {
-	public static BitArray[,] bombRight;
-	public static BitArray[,] bombLeft;
-	public static BitArray[,] bombUp;
-	public static BitArray[,] bombDown;
+    using System.Collections;
 
-	public static BitArray[] moveRight;
-	public static BitArray[] moveLeft;
-	public static BitArray[] moveUp;
-	public static BitArray[] moveDown;
+    public class BitMaps
+    {
+        public static BitArray[,] bombRight;
+        public static BitArray[,] bombLeft;
+        public static BitArray[,] bombUp;
+        public static BitArray[,] bombDown;
 
-	public static void GenerateMoves()
-	{
-		moveRight = new BitArray[Constants.PlayableSquares];
-		moveLeft = new BitArray[Constants.PlayableSquares];
-		moveUp = new BitArray[Constants.PlayableSquares];
-		moveDown = new BitArray[Constants.PlayableSquares];
+        public static BitArray[] moveRight;
+        public static BitArray[] moveLeft;
+        public static BitArray[] moveUp;
+        public static BitArray[] moveDown;
 
-		for (int p = 0; p < Constants.PlayableSquares; p++)
-		{
-			var mapPos = BitState.GetMapIndex(p);
+        public static void GenerateMoves()
+        {
+            moveRight = new BitArray[Constants.PlayableSquares];
+            moveLeft = new BitArray[Constants.PlayableSquares];
+            moveUp = new BitArray[Constants.PlayableSquares];
+            moveDown = new BitArray[Constants.PlayableSquares];
 
-			// right
-			var bits = new BitArray(Constants.PlayableSquares);
-			bits[p] = true;
+            for (int p = 0; p < Constants.PlayableSquares; p++)
+            {
+                var mapPos = BitState.GetMapIndex(p);
 
-			if (mapPos.Item1 + 1 < Constants.BoardWidth && mapPos.Item2 % 2 == 0)
-			{
-				bits[p + 1] = true;
-			}
+                // right
+                var bits = new BitArray(Constants.PlayableSquares);
+                bits[p] = true;
 
-			moveRight[p] = bits;
+                if (mapPos.Item1 + 1 < Constants.BoardWidth && mapPos.Item2 % 2 == 0)
+                {
+                    bits[p + 1] = true;
+                }
 
-			// left
-			bits = new BitArray(Constants.PlayableSquares);
-			bits[p] = true;
+                moveRight[p] = bits;
 
-			if (mapPos.Item1 - 1 >= 0 && mapPos.Item2 % 2 == 0)
-			{
-				bits[p - 1] = true;
-			}
+                // left
+                bits = new BitArray(Constants.PlayableSquares);
+                bits[p] = true;
 
-			moveLeft[p] = bits;
+                if (mapPos.Item1 - 1 >= 0 && mapPos.Item2 % 2 == 0)
+                {
+                    bits[p - 1] = true;
+                }
 
-			// up
-			bits = new BitArray(Constants.PlayableSquares);
-			bits[p] = true;
+                moveLeft[p] = bits;
 
-			if (mapPos.Item2 - 1 >= 0 && mapPos.Item1 % 2 == 0)
-			{
-				bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 - 1)] = true;
-			}
+                // up
+                bits = new BitArray(Constants.PlayableSquares);
+                bits[p] = true;
 
-			moveUp[p] = bits;
+                if (mapPos.Item2 - 1 >= 0 && mapPos.Item1 % 2 == 0)
+                {
+                    bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 - 1)] = true;
+                }
 
-			// down
-			bits = new BitArray(Constants.PlayableSquares);
-			bits[p] = true;
+                moveUp[p] = bits;
 
-			if (mapPos.Item2 + 1 < Constants.BoardHeight && mapPos.Item1 % 2 == 0)
-			{
-				bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 + 1)] = true;
-			}
+                // down
+                bits = new BitArray(Constants.PlayableSquares);
+                bits[p] = true;
 
-			moveDown[p] = bits;
-		}
-	}
+                if (mapPos.Item2 + 1 < Constants.BoardHeight && mapPos.Item1 % 2 == 0)
+                {
+                    bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 + 1)] = true;
+                }
 
-	public static void GenerateBombs()
-	{
-		bombRight = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
-		bombLeft = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
-		bombUp = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
-		bombDown = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
-		for (int i = 1; i <= Constants.BoardWidth; i++)
-		{
-			for (int p = 0; p < Constants.PlayableSquares; p++)
-			{
-				var mapPos = BitState.GetMapIndex(p);
+                moveDown[p] = bits;
+            }
+        }
 
-				// right
-				var bits = new BitArray(Constants.PlayableSquares);
+        public static void GenerateBombs()
+        {
+            bombRight = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
+            bombLeft = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
+            bombUp = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
+            bombDown = new BitArray[Constants.BoardWidth, Constants.PlayableSquares];
+            for (int i = 1; i <= Constants.BoardWidth; i++)
+            {
+                for (int p = 0; p < Constants.PlayableSquares; p++)
+                {
+                    var mapPos = BitState.GetMapIndex(p);
 
-				if (mapPos.Item1 + i < Constants.BoardWidth && mapPos.Item2 % 2 == 0)
-				{
-					bits[p + i] = true;
-				}
+                    // right
+                    var bits = new BitArray(Constants.PlayableSquares);
 
-				bombRight[i - 1, p] = bits;
+                    if (mapPos.Item1 + i < Constants.BoardWidth && mapPos.Item2 % 2 == 0)
+                    {
+                        bits[p + i] = true;
+                    }
 
-				// left
-				bits = new BitArray(Constants.PlayableSquares);
+                    bombRight[i - 1, p] = bits;
 
-				if (mapPos.Item1 - i >= 0 && mapPos.Item2 % 2 == 0)
-				{
-					bits[p - i] = true;
-				}
+                    // left
+                    bits = new BitArray(Constants.PlayableSquares);
 
-				bombLeft[i - 1, p] = bits;
+                    if (mapPos.Item1 - i >= 0 && mapPos.Item2 % 2 == 0)
+                    {
+                        bits[p - i] = true;
+                    }
 
-				// up
-				bits = new BitArray(Constants.PlayableSquares);
+                    bombLeft[i - 1, p] = bits;
 
-				if (mapPos.Item2 - i >= 0 && mapPos.Item1 % 2 == 0)
-				{
-					bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 - i)] = true;
-				}
+                    // up
+                    bits = new BitArray(Constants.PlayableSquares);
 
-				bombUp[i - 1, p] = bits;
+                    if (mapPos.Item2 - i >= 0 && mapPos.Item1 % 2 == 0)
+                    {
+                        bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 - i)] = true;
+                    }
 
-				// down
-				bits = new BitArray(Constants.PlayableSquares);
+                    bombUp[i - 1, p] = bits;
 
-				if (mapPos.Item2 + i < Constants.BoardHeight && mapPos.Item1 % 2 == 0)
-				{
-					bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 + i)] = true;
-				}
+                    // down
+                    bits = new BitArray(Constants.PlayableSquares);
 
-				bombDown[i - 1, p] = bits;
-			}
-		}
-	}
+                    if (mapPos.Item2 + i < Constants.BoardHeight && mapPos.Item1 % 2 == 0)
+                    {
+                        bits[BitState.GetBitIndex(mapPos.Item1, mapPos.Item2 + i)] = true;
+                    }
+
+                    bombDown[i - 1, p] = bits;
+                }
+            }
+        }
+    }
 }
